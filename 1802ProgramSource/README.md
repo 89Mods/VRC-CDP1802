@@ -12,3 +12,11 @@ Lastly, download the Hex2bin from https://sourceforge.net/projects/hex2bin/ . Fi
 You can now compile the demo program by running `build.bat` in the source code  directory (`C:\lcc42\examples\VRC`). It should output a texture file at `program.png` containing the compiled bytecode. If there is no such output, ensure you have at least Java 11 installed on your system, as it is required for the binary-to-texture conversion step.
 
 The generated texture can be moved into the Unity project to update the program run by the emulator.
+
+# Notes on programming the emulator
+
+- The emulator is very, *very* slow. Use every optimization you possibly can. Large memory operations like clearing the screen or functions like `memcpy` and `memset` are particularly expensive.
+- You are programming in **the original ANSI C**, also known as C89. It is quite different then modern C, and might take some time getting used to.
+- Datatype sizes are different then regular C. `int` is 16-bit, `long` is 32-bit. There is no 64-bit integer support. Both `float` and `double` are 32-bit.
+- Avoid floating-point numbers. The time it takes for the benchmarks included in the demo to run shoud be enough to explain why.
+- Avoid multiplications and divisions! The CPU emulated here contains no dedicated instructions for these, so has to do both in software, which takes time.
