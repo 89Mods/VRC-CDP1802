@@ -6,7 +6,7 @@ CustomRenderTexture:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MemoryCRT
+  m_Name: ReadableMemoryCRT
   m_ImageContentsHash:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
@@ -18,13 +18,13 @@ CustomRenderTexture:
   m_AntiAliasing: 1
   m_MipCount: -1
   m_DepthFormat: 0
-  m_ColorFormat: 40
+  m_ColorFormat: 8
   m_MipMap: 0
   m_GenerateMips: 1
   m_SRGB: 0
   m_UseDynamicScale: 0
   m_BindMS: 0
-  m_EnableCompatibleFormat: 0
+  m_EnableCompatibleFormat: 1
   m_TextureSettings:
     serializedVersion: 2
     m_FilterMode: 0
@@ -35,28 +35,18 @@ CustomRenderTexture:
     m_WrapW: 1
   m_Dimension: 2
   m_VolumeDepth: 1
-  m_Material: {fileID: 2100000, guid: a4635e4dd2d68d045a8945142f4354c9, type: 2}
+  m_Material: {fileID: 2100000, guid: b5fd17dc30c9c8b4dadb29872eda9c71, type: 2}
   m_InitSource: 0
   m_InitMaterial: {fileID: 0}
   m_InitColor: {r: 0, g: 0, b: 0, a: 1}
   m_InitTexture: {fileID: 0}
   m_UpdateMode: 1
   m_InitializationMode: 0
-  m_UpdateZoneSpace: 1
-  m_CurrentUpdateZoneSpace: 1
-  m_UpdateZones:
-  - updateZoneCenter: {x: 128, y: 128, z: 0.5}
-    updateZoneSize: {x: 256, y: 256, z: 1}
-    rotation: 0
-    passIndex: -1
-    needSwap: 1
-  - updateZoneCenter: {x: 128, y: 20, z: 0.5}
-    updateZoneSize: {x: 256, y: 4, z: 1}
-    rotation: 0
-    passIndex: -1
-    needSwap: 1
+  m_UpdateZoneSpace: 0
+  m_CurrentUpdateZoneSpace: 0
+  m_UpdateZones: []
   m_UpdatePeriod: 0
   m_ShaderPass: 0
   m_CubemapFaceMask: 4294967295
-  m_DoubleBuffered: 1
+  m_DoubleBuffered: 0
   m_WrapUpdateZones: 0

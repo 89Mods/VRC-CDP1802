@@ -4,9 +4,11 @@ This part of the repository contains the Unity assets of the actual emulator.
 
 "CRT" is the Custom Render Texture used by the emulator as RAM. It is set up in a very particular way. Do not modify!
 
+"ReadableMemoryCRT" is the contents of the CRT converted into a image. Usefull for reading CPU memory bytes in a surface shader.
+
 The folder "PutTheseOnChestBone" contains two prefabs that constitute the input layer for the emulator. Without it, the emulator cannot be started or controlled.
 
-"PSDMat" simply displays the contents of the emulator's memory. Apply to a Quad to use as a debug view.
+"MemoryMonitor" simply displays the contents of the emulator's memory. Apply to a Quad to use as a debug view.
 
 "TTY" is the stdout of the emulator. All text printed by the program appears here. Apply to a Quad anywhere on the avatar/world.
 

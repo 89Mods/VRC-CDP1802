@@ -37,26 +37,21 @@
 			};
 
 			//64x50 chars
-			sampler2D _MainTex;
+			Texture2D<uint4> _MainTex;
 			sampler2D _Charset;
-			float4 _MainTex_ST;
 			int _CursorEnabled;
 			float _CursorInterval;
 			fixed4 _Tint;
 
-			#define byte_uv(x) (float2((float)((x) & 255) / 256.0f, (float)((x) >> 8) / 256.0f))
-
 			uint read_memory_byte(int address) {
-				float2 uv = byte_uv(address);
-				float data = tex2D(_MainTex, uv).r;
-				return (uint)(data * 255.0);
+				return _MainTex[uint2(address & 0xFF, address >> 8)].x & 0xFF;
 			}
 
 			v2f vert (appdata v)
 			{
 				v2f o;
 				o.vertex = UnityObjectToClipPos(v.vertex);
-				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+				o.uv = v.uv;
 				return o;
 			}
 
@@ -70,7 +65,7 @@
 				uint addr = bufferAddr + (chary * 64 + charx) * 2;
 				uint ch = read_memory_byte(addr);
 				if(ch == 0) ch = ' ';
-				if(ch < ' ' || ch > 127) return fixed4(1, 0, 0, 1);
+				//if(ch < ' ' || ch > 127) return fixed4(1, 0, 0, 1);
 				uint icx = (uint)(i.uv.x * 64.0 * 6.0) % 6;
 				uint icy = (uint)(i.uv.y * 50.0 * 9.0) % 9;
 				if(icy == 8) return fixed4(0, 0, 0, 1);
