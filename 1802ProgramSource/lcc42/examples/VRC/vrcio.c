@@ -5,9 +5,8 @@ unsigned char terminal[TERM_W * TERM_H][2];
 unsigned char currRow = 0;
 unsigned char currCol = 0;
 unsigned char currTextColor = 63;
-unsigned char* curserLocPntr = (unsigned char *)65532;
 
-void shiftLinesUp() {
+void shiftLinesUp(void) {
 	int i,j;
 	for(i = 1; i < TERM_H; i++) {
 		for(j = 0; j < TERM_W; j++) {
@@ -39,18 +38,19 @@ void putc(char c) {
 		*(curserLocPntr + 1) = currCol;
 		return;
 	}
+	if(currCol == 64) {
+		putc('\n');
+		putc(c);
+		return;
+	}
 	terminal[currRow * TERM_W + currCol][0] = c;
 	terminal[currRow * TERM_W + currCol][1] = currTextColor;
 	currCol++;
-	if(currCol == 65) {
-		putc('\n');
-		putc(c);
-	}
 	*curserLocPntr = currRow;
 	*(curserLocPntr + 1) = currCol;
 }
 
-void terminalInit() {
+void terminalInit(void) {
 	int i;
 	unsigned char* bufferPntr = (unsigned char *)65534;
 	currTextColor = 63;
@@ -66,14 +66,24 @@ void terminalInit() {
 
 void setCursorRow(char row) {
 	currRow = row;
+	*curserLocPntr = currRow;
 }
 
 void setCursorCol(char col) {
 	currCol = col;
+	*(curserLocPntr + 1) = currCol;
 }
 
 void setTextColor(char color) {
 	currTextColor = color;
+}
+
+char getCursorRow(void) {
+	return currRow;
+}
+
+char getCursorCol(void) {
+	return currCol;
 }
 
 void delay(int amount) {
@@ -81,4 +91,25 @@ void delay(int amount) {
 	for(i = 0; i < amount; i++) {
 		asm("\tnop");
 	}
+}
+
+char getKey(void) {
+	unsigned char ret;
+	while(!(*keypadInputPntr)) yield();
+	yield();
+	yield();
+	yield();
+	yield();
+	ret = *keypadInputPntr;
+	ret += 1;
+	ret >>= 3;
+	while(*keypadInputPntr) yield();
+	yield();
+	if(ret == 6) ret = 0;
+	return ret;
+}
+
+void yield(void) { //Execute YIELD pseudo-instruction in emulator
+	asm("\tdb 0x68\n");
+	asm("\tdb 0xE0");
 }
