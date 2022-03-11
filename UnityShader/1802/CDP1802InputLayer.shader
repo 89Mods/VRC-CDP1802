@@ -48,7 +48,7 @@
 
 			fixed4 frag (v2f i) : SV_Target
 			{
-				fixed4 col = fixed4(!_Pause, _Reset, _KeypadInput == 0 ? 0 : _KeypadInput * 10.0 + 0.015686, 1);
+				fixed4 col = fixed4(!_Pause, _Reset, _KeypadInput, 1);
 				return col;
 			}
 			ENDCG
