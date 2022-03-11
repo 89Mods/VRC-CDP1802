@@ -27,7 +27,7 @@
 			#define EMU_INT_TRIG 8
 			#define EMU_STAGE 16
 			#define _IPF_MAX 128
-			#define _CACHE_SIZE (_IPF_MAX / 8)
+			#define _CACHE_SIZE (_IPF_MAX / 7)
 
 			#define STATUS_ADDR 59904
 			#define R0_ADDR 59905
@@ -119,7 +119,7 @@
 				}//else if(idxy == 255) return uint4(0, 0, 0, 0xFFFFFFFF);
 
 				uint4 col = _SelfTexture2D[uint2(idxx, idxy)]; //Return this if unchanged
-				if(idxy == 254) return tex2D(_CPUInputGrab, float2(0.314453125, 1.0 - 0.66));
+				//if(idxy == 254) return tex2D(_CPUInputGrab, float2(0.314453125, 1.0 - 0.66));
 
 				if((status & EMU_RUNNING) == 0) { //Emulator is paused
 					if(idx == STATUS_ADDR && tex2D(_CPUInputGrab, float2(0.314453125, 1.0 - 0.66)).r > 0.5) {
@@ -187,9 +187,12 @@
 
 					if(idxy >= 238 && idxy < 254 && idxx >= 100 && idxx < 114) {
 						uint reg = (idxx - 100) / 2;
-						uint val = read_emulator_byte(D_DF_ADDR + reg > 0 ? reg - 1 : 0);
-						if(reg == 0) val &= 0xFF;
-						else if(reg == 1) val = (val >> 8) & 1;
+						uint val;
+						if(reg < 2) {
+							uint a = read_emulator_word(D_DF_ADDR);
+							if(reg == 0) val = a & 0xFF;
+							else val = (a >> 8) & 1;
+						}else val = read_emulator_byte(D_DF_ADDR + reg - 1);
 
 						col.y = 0x3F;
 						if(reg == 1 || reg == 5 || reg == 6) {
