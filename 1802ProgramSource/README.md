@@ -6,6 +6,7 @@ Particularly, the Rhinestone compiler (Rhinestone.zip in the downloads section).
 Ensure that the compiler is installed at the root of the C drive (`C:/lcc42`), then merge the contents of this directory into the compiler installation. The source code for the VRC CDP1802 demo should be at `C:/lcc42/examples/VRC` afterwards.
 
 Next, the compiler needs to be patched to use the correct routine for putc/putchar. Edit the file `C:/lcc42/include/IO1802.inc` and remove line 4 (`_putc:`) and save.
+Lastly, printf will be broken unless you also edit `C:/lcc42/include/nstdlib.c`, go to line 41 and replace the line `while(*ptr) out(5,*ptr++);` with `while(*ptr) putc(*ptr++);`.
 
 Lastly, download the Hex2bin from https://sourceforge.net/projects/hex2bin/ . Find the `hex2bin.exe` file and place it into the source code directory (`C:\lcc42\examples\VRC`).
 
