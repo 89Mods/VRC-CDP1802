@@ -101,8 +101,6 @@ char getKey(void) {
 	yield();
 	yield();
 	ret = *keypadInputPntr;
-	ret += 1;
-	ret >>= 3;
 	while(*keypadInputPntr) yield();
 	yield();
 	if(ret == 6) ret = 0;
