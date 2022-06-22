@@ -5,12 +5,14 @@
 		_Program ("ROM Image", 2D) = "black" {}
 		_Button ("Button texture", 2D) = "black" {}
 		_IPF ("Target Instructions Per Second", Int) = 64
+		[Toggle] _IgnoreInput ("Ignore input layer", Int) = 0
 	}
 	SubShader
 	{
 		Tags { "RenderType"="Opaque" }
 		Lighting Off
 		Blend One Zero
+		ZTest Always
 		LOD 100
 
 		Pass
@@ -26,8 +28,8 @@
 			#define EMU_IDL 4
 			#define EMU_INT_TRIG 8
 			#define EMU_STAGE 16
-			#define _IPF_MAX 128
-			#define _CACHE_SIZE (_IPF_MAX / 7)
+			#define _IPF_MAX 196
+			#define _CACHE_SIZE (_IPF_MAX / 4)
 
 			#define STATUS_ADDR 59904
 			#define R0_ADDR 59905
@@ -64,6 +66,7 @@
 			sampler2D _Button;
 			sampler2D _CPUInputGrab;
 			int _IPF;
+			int _IgnoreInput;
 
 			#define byte_uv(x) (float2((float)((x) & 255) / 256.0f, (float)((x) >> 8) / 256.0f))
 			#define read_reg(x) (read_emulator_word(R0_ADDR + (x)) & 0xFFFF)
@@ -75,12 +78,6 @@
 
 			uint4 frag (v2f_customrendertexture i) : COLOR
 			{
-				float4 checkCol = tex2D(_CPUInputGrab, float2(0.314453125, 1.0 - 0.672));
-				if(abs(checkCol.r - 0.1) > 0.01 || abs(checkCol.g - 0.5) > 0.01 || abs(checkCol.b - 0.2) > 0.01) {
-
-					//discard;
-				}
-
 				//Verify texture integrity
 				uint integrityByte = read_emulator_byte(0);
 				uint integrityByte2 = read_emulator_byte(65535);
@@ -98,7 +95,7 @@
 				uint idxy = (uint)(i.globalTexcoord.y * 256.0);
 				uint idx = idxy * 256 + idxx;
 
-				if(status == 0 || tex2D(_CPUInputGrab, float2(0.314453125, 1.0 - 0.66)).g > 0.5) { //Needs to be initialized
+				if(status == 0 || (!_IgnoreInput && tex2D(_CPUInputGrab, float2(0.314453125, 1.0 - 0.66)).g < 0.4)) { //Needs to be initialized
 					uint memoryInit = 0; //Initial value for this memory cell.
 					if(idx < 32768) {
 						memoryInit = (int)(tex2D(_Program, byte_uv(idx)).r * 255.0);
@@ -119,10 +116,13 @@
 				}//else if(idxy == 255) return uint4(0, 0, 0, 0xFFFFFFFF);
 
 				uint4 col = _SelfTexture2D[uint2(idxx, idxy)]; //Return this if unchanged
-				//if(idxy == 254) return tex2D(_CPUInputGrab, float2(0.314453125, 1.0 - 0.66));
+				/*if(idxy == 254) {
+					float4 a = tex2D(_CPUInputGrab, float2(0.314453125, 1.0 - 0.66));
+					return uint4((uint)(a.r * 255), (uint)(a.g * 255), (uint)(a.b * 255), 0xFFFFFFFF);
+				}*/
 
 				if((status & EMU_RUNNING) == 0) { //Emulator is paused
-					if(idx == STATUS_ADDR && tex2D(_CPUInputGrab, float2(0.314453125, 1.0 - 0.66)).r > 0.5) {
+					if(idx == STATUS_ADDR && (_IgnoreInput || tex2D(_CPUInputGrab, float2(0.314453125, 1.0 - 0.66)).r > 0.5)) {
 						status |= EMU_RUNNING;
 						col.y = status;
 					}
@@ -171,8 +171,14 @@
 						}else col.x = 0;
 					}
 
-					if(idx == 65529) {
-						col.x = (uint)(tex2D(_CPUInputGrab, float2(0.314453125, 1.0 - 0.66)).b * 255.0);
+					if(idx == 65529 && !_IgnoreInput) {
+						float3 inp = tex2D(_CPUInputGrab, float2(0.314453125, 1.0 - 0.66));
+						if(inp.r > 0.5 && inp.g > 0.5 && inp.b > 0.5) {
+							uint b1 = inp.r >= 0.64 ? 1 : 0;
+							uint b2 = inp.g >= 0.64 ? 1 : 0;
+							uint b3 = inp.b >= 0.64 ? 1 : 0;
+							col.x = (b3 << 2) | (b2 << 1) | b1;
+						}
 					}
 
 					if(idxy >= 238 && idxy < 254 && idxx >= 64 && idxx < 96) {
@@ -602,7 +608,7 @@
 					}
 
 					if(idx == STATUS_ADDR) {
-						if(tex2D(_CPUInputGrab, float2(0.314453125, 1.0 - 0.66)).r <= 0.5) {
+						if(!_IgnoreInput && tex2D(_CPUInputGrab, float2(0.314453125, 1.0 - 0.66)).r <= 0.5) {
 							status &= (~EMU_RUNNING);
 						}else status |= EMU_RUNNING;
 					}
