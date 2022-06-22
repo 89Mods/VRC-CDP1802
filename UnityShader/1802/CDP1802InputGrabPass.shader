@@ -49,8 +49,8 @@
 
 			fixed4 frag (v2f i) : SV_Target
 			{
-				fixed4 col = tex2D(_CPUInputGrab, i.uv);
-				return col;
+				//return tex2D(_CPUInputGrab, float2(0.5, 0.5));
+				return fixed4(0, 0, 0, 1);
 			}
 			ENDCG
 		}
